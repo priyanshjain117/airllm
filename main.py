@@ -1,30 +1,31 @@
-from airllm import AutoModel
-from transformers import AutoTokenizer
-import mlx.core as mx
-import dotenv
+from mlx_lm import load, generate
 from dotenv import load_dotenv
+import dotenv
+import os
 
 load_dotenv()
 
-model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+model_path = os.path.join(dotenv.get_key(".env", "MODEL_PATH"), "llama3-mlx-4bit")
 
-model = AutoModel.from_pretrained(
-    model_id,
-    layer_shards_saving_path=dotenv.get_key(".env", "MODEL_PATH")
+model, tokenizer = load(model_path)
+
+messages = [
+    {"role": "system", "content": "Answer in exactly four words."},
+    {"role": "user", "content": "Tell a movie name."}
+]
+
+prompt = tokenizer.apply_chat_template(
+    messages,
+    tokenize=False,
+    add_generation_prompt=True
 )
 
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-
-# Keep prompt as short as possible to avoid GPU timeout
-prompt = "Name one movie:"
-
-ids = tokenizer(prompt)["input_ids"]
-inputs = mx.array([ids], dtype=mx.int32)
-
-output = model.generate(
-    inputs,
-    max_new_tokens=5,   # as low as possible
-    temperature=0
+response = generate(
+    model,
+    tokenizer,
+    prompt=prompt,
+    max_tokens=20,
+    verbose=True
 )
 
-print(output)
+print(response)

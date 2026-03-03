@@ -1,0 +1,11 @@
+airllm
+torch
+mlx
+mlx-lm
+transformers
+accelerate
+huggingface_hub
+safetensors
+sentencepiece
+bitsandbytes
+dotenv

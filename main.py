@@ -26,9 +26,8 @@ prompt = tokenizer.apply_chat_template(
     add_generation_prompt=True
 )
 
-ids = tokenizer(prompt)["input_ids"]  # plain list, no mx.array
-
-inputs = mx.array([ids], dtype=mx.int32)  # 1D, no extra brackets
+ids = tokenizer(prompt)["input_ids"]
+inputs = mx.array([ids], dtype=mx.int32)  # shape: [1, seq_len]
 
 output = model.generate(
     inputs,
@@ -36,4 +35,5 @@ output = model.generate(
     temperature=0
 )
 
-print(tokenizer.decode(output.tolist(), skip_special_tokens=True))
+# output is a string from MLX backend
+print(output)
